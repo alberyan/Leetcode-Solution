@@ -45,6 +45,22 @@ class Solution {
             }
             res.add(curStringList);
         }
+        int mul = 1;
+        for (int i = 0; i < len; i++){
+            int curLine = len - i - 1;
+            List<String> curStringList = res.get(curLine);
+            List<TreeNode> curNodeList = list.get(curLine);
+            for (int j = 0; j < curNodeList.size(); j++){
+                TreeNode curNode = curNodeList.get(j);
+                if (curNode == null) continue;
+                curStringList.set(mul * 2 * j + mul - 1, curNode.val + "");
+            }
+            mul *= 2;
+        }
+
         return res;
     }
 }
+
+// Runtime: 1 ms, faster than 100.00% of Java online submissions for Print Binary Tree.
+// Memory Usage: 37.4 MB, less than 80.95% of Java online submissions for Print Binary Tree.

@@ -2,19 +2,13 @@ class TimeMap {
     class Node{
         int time;
         String value;
-        Node(int time, int value){
+        Node(int time, String value){
             this.time = time;
             this.value = value;
         }
     }
 
-    class NodeComparator implements Comparator<Node>{
-        public int compare(Node n1, Node n2){
-            return n1.time - n2.time;
-        }
-    }
-
-    Map<String, PriorityQueue<Node>> map;
+    Map<String, List<Node>> map;
 
     /** Initialize your data structure here. */
     public TimeMap() {
@@ -23,24 +17,25 @@ class TimeMap {
 
     public void set(String key, String value, int timestamp) {
         Node cur = new Node(timestamp, value);
-        PriorityQueue<Node> pq = map.getOrDefault(key, new PriorityQueue<Node>());
-        pq.offer(cur);
-        map.put(key, pq);
+        List<Node> list = map.getOrDefault(key, new ArrayList<>());
+        list.add(cur);
+        map.put(key, list);
     }
 
     public String get(String key, int timestamp) {
-        Queue<Node> q = new LinkedList<>();
-        PriorityQueue<Node> pq = map.get(key);
-        if (pq == null || pq.peek().time > timestamp) return null;
-        while (!pq.isEmpty()){
-            if (pq.peek().time < timestamp) q.offer(pq.poll());
-            else break;
+        List<Node> list = map.get(key);
+        if (list == null || list.get(0).time > timestamp) return "";
+        int left = 0;
+        int right = list.size() - 1;
+        if (timestamp >= list.get(right).time) return list.get(right).value;
+        while (left < right - 1){
+            int mid = (left + right) / 2;
+            Node midNode = list.get(mid);
+            if (midNode.time == timestamp) return midNode.value;
+            else if (midNode.time > timestamp) right = mid;
+            else left = mid;
         }
-        String res = q.get(q.size() - 1);
-        for (String s: q){
-            pq.offer(s);
-        }
-        return res;
+        return list.get(left).value;
     }
 }
 
@@ -50,3 +45,6 @@ class TimeMap {
  * obj.set(key,value,timestamp);
  * String param_2 = obj.get(key,timestamp);
  */
+
+// Runtime: 182 ms, faster than 98.17% of Java online submissions for Time Based Key-Value Store.
+// Memory Usage: 134.2 MB, less than 96.60% of Java online submissions for Time Based Key-Value Store.
